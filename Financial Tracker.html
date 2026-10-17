@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Ledger – Lifetime Finance Tracker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#f5f5f5;--side:#fbfbfb;--card:#fff;--tx:#151515;--mu:#747474;--ln:#e5e5e5;--ac:#111;--pos:#16854a;--neg:#c43d3d;--sel:#efefef;--shadow:0 1px 2px rgba(0,0,0,.035),0 6px 18px rgba(0,0,0,.025);--shadow-hover:0 3px 7px rgba(0,0,0,.07),0 20px 42px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.6);color-scheme:light;box-sizing:border-box}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111;--side:#151515;--card:#1b1b1b;--tx:#f4f4f4;--mu:#a0a0a0;--ln:#303030;--ac:#f2f2f2;--pos:#4ade80;--neg:#ff7373;--sel:#292929;--shadow:0 1px 2px rgba(0,0,0,.2),0 8px 20px rgba(0,0,0,.12);--shadow-hover:0 4px 10px rgba(0,0,0,.28),0 22px 48px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#111;--side:#151515;--card:#1b1b1b;--tx:#f4f4f4;--mu:#a0a0a0;--ln:#303030;--ac:#f2f2f2;--pos:#4ade80;--neg:#ff7373;--sel:#292929;--shadow:0 1px 2px rgba(0,0,0,.2),0 8px 20px rgba(0,0,0,.12);--shadow-hover:0 4px 10px rgba(0,0,0,.28),0 22px 48px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05);color-scheme:dark}
+:root[data-theme="light"]{color-scheme:light}
+html{height:100%;scroll-padding-top:12px}*{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#bdbdbd transparent}::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#c5c5c5;border:3px solid transparent;background-clip:padding-box;border-radius:10px}::-webkit-scrollbar-thumb:hover{background:#929292;border:3px solid transparent;background-clip:padding-box}body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font:13px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}#app{display:flex;height:100%;min-height:0}aside{width:224px;flex:none;background:var(--side);border-right:1px solid var(--ln);padding:18px 12px;display:flex;flex-direction:column;gap:4px}aside h1{font-size:15px;margin:2px 10px 16px;font-weight:700;letter-spacing:-.25px;color:var(--tx)}.nav{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:9px;cursor:pointer;color:var(--mu);border:0;background:none;font:inherit;text-align:left;width:100%;transition:background .16s ease,color .16s ease}.nav b{width:19px;text-align:center;color:inherit;font-size:14px}.nav:hover{background:var(--sel);color:var(--tx)}.nav.on{background:var(--sel);color:var(--tx);font-weight:650;box-shadow:inset 0 0 0 1px var(--ln),0 2px 6px rgba(0,0,0,.045)}.sp{flex:1}.foot{color:var(--mu);font-size:11px;padding:0 10px;line-height:1.55}main{flex:1;overflow:auto;overscroll-behavior:contain;padding:26px 30px 44px;min-width:0;scrollbar-gutter:stable} .top{display:flex;align-items:center;gap:9px;margin-bottom:18px;flex-wrap:wrap}.top h2{font-size:23px;margin:0;letter-spacing:-.55px;font-weight:680;flex:1}.b,button.b{background:var(--card);border:1px solid var(--ln);border-radius:9px;padding:7px 13px;min-height:34px;cursor:pointer;transition:background .15s ease,border-color .15s ease,transform .15s ease,box-shadow .15s ease}.b:hover{background:var(--sel);border-color:#d2d2d2;box-shadow:0 4px 10px rgba(0,0,0,.08);transform:translateY(-1px)}.b:active{transform:translateY(1px)}.b.p{background:var(--ac);border-color:var(--ac);color:var(--bg);font-weight:600;box-shadow:0 2px 0 rgba(0,0,0,.12),0 6px 14px rgba(0,0,0,.12)}.b.p:hover{filter:brightness(.88);box-shadow:0 3px 0 rgba(0,0,0,.12),0 10px 20px rgba(0,0,0,.17)}.b.d{color:var(--neg);border-color:color-mix(in srgb,var(--neg) 30%,var(--ln))}.b.d:hover{background:color-mix(in srgb,var(--neg) 8%,var(--card))}button:disabled{opacity:.45;cursor:not-allowed}button.b,select,input,textarea{font:inherit;color:var(--tx)}:focus-visible{outline:2px solid var(--ac);outline-offset:2px}input,select,textarea{background:var(--card);border:1px solid var(--ln);border-radius:9px;padding:7px 10px;width:100%;transition:border-color .15s ease,box-shadow .15s ease}input:hover,select:hover,textarea:hover{border-color:#c5c5c5}input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 9%,transparent);outline:0}.grid{display:grid;gap:14px}.g4{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))}.card{position:relative;background:linear-gradient(150deg,color-mix(in srgb,var(--card) 96%,white),var(--card) 68%);border:1px solid var(--ln);border-radius:16px;padding:17px;min-width:0;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.42);transform:perspective(1200px) translateZ(0);transform-style:preserve-3d;transition:transform .24s cubic-bezier(.2,.8,.2,1),box-shadow .24s ease,border-color .24s ease;will-change:transform}.card::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.1),transparent 38%);opacity:.55}.card:hover{transform:perspective(1200px) translateY(-3px) rotateX(.65deg);box-shadow:var(--shadow-hover);border-color:color-mix(in srgb,var(--ln) 60%,var(--tx));z-index:2}.card:active{transform:perspective(1200px) translateY(-1px) scale(.998)}.card h3{margin:0 0 11px;font-size:12px;color:var(--mu);font-weight:650;letter-spacing:.015em}.big{font-size:26px;font-weight:700;letter-spacing:-.65px;line-height:1.2}.hero{font-size:38px}.pos{color:var(--pos)}.neg{color:var(--neg)}.mu{color:var(--mu)}table{width:100%;min-width:540px;border-collapse:collapse;font-size:12px}th{text-align:left;color:var(--mu);font-weight:600;padding:9px 10px;border-bottom:1px solid var(--ln);position:sticky;top:0;background:var(--card);z-index:1}td{padding:9px 10px;border-bottom:1px solid var(--ln);vertical-align:middle}tbody tr:last-child td{border-bottom:0}tr:hover td{background:color-mix(in srgb,var(--sel) 65%,var(--card))}td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}.scroll{overflow:auto;overscroll-behavior:contain}.bar{height:7px;background:var(--ln);border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac);border-radius:99px}.row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:6px 0}.tag{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--sel);color:var(--tx);font-weight:550}dialog{border:1px solid var(--ln);border-radius:16px;background:var(--card);color:var(--tx);padding:22px;width:min(460px,94vw);max-height:88vh;overflow:auto;box-shadow:0 24px 80px rgba(0,0,0,.22)}dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(2px)}dialog.wide{width:min(780px,96vw)}dialog h3{margin:0 0 14px;font-size:16px;letter-spacing:-.2px}.f{display:grid;grid-template-columns:1fr 1fr;gap:11px}.f label{display:block;color:var(--mu);font-size:11px;margin-bottom:4px;font-weight:550}.f .w{grid-column:1/-1}.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#181818;color:#fff;padding:9px 16px;border-radius:99px;opacity:0;transition:opacity .2s;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:10}#toast.on{opacity:1}.empty{padding:34px 20px;text-align:center;color:var(--mu)}.bar-ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}.bar-ctl select,.bar-ctl input{width:auto}.seg{display:inline-flex;border:1px solid var(--ln);border-radius:9px;overflow:hidden;background:var(--card)}.seg button{border:0;background:transparent;padding:6px 12px;cursor:pointer;font:inherit;color:var(--mu)}.seg button:hover{background:var(--sel);color:var(--tx)}.seg button.on{background:var(--ac);color:var(--bg)}.pie{display:flex;gap:18px;align-items:center;flex-wrap:wrap}.lg{flex:1;min-width:190px}.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:7px}.card.scroll{max-width:100%}.card.scroll:hover{transform:none}svg{max-width:100%}@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}.card:hover,.card:active,.b:hover,.b:active{transform:none!important}}@media(max-width:700px){aside{width:64px;padding:14px 7px}.nav{justify-content:center;padding:9px 7px}.nav span,aside h1,.foot{display:none}.nav b{width:auto}main{padding:17px 14px 30px;scrollbar-gutter:auto}.top{gap:7px}.top h2{font-size:21px}.g2{grid-template-columns:1fr}.card{padding:14px}.hero{font-size:33px}.bar-ctl select,.bar-ctl input{max-width:100%}.f{gap:9px}}</style><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script><script src="https://accounts.google.com/gsi/client" async defer></script></head><body>
+<div id="app"><aside>
+<h1>Ledger</h1><div id="nav"></div><div class="sp"></div>
+<div class="foot" id="fstat"></div></aside>
+<main id="main"></main></div>
+<dialog id="dlg"></dialog><dialog id="cf"></dialog><dialog id="sc" class="wide"></dialog><input type="file" id="pick" accept=".json,application/json" hidden><div id="toast"></div>
+<script>
+const SCHEMA=3;
+const TYPES={bank:'Bank account',cash:'Cash',card:'Credit card',loan:'Loan',invest:'Investment'};
+const LIAB=t=>t==='card'||t==='loan';
+const EXP=['Housing','Food','Transport','Utilities','Health','Shopping','Entertainment','Education','Insurance','Travel','Interest & fees','Other'];
+const INC=['Salary','Business','Investment','Gift','Refund','Other income'];
+let S=fresh(),view='dash',flt={q:'',acc:'',type:'',from:'',to:'',sort:'date-desc'},rep={months:12};
+function migrate(d){if(!d||typeof d!=='object'||!Array.isArray(d.accounts||[])||!Array.isArray(d.tx||d.transactions||[]))throw new SyntaxError('bad');
+ if(!d.v||d.v<2)d={v:2,accounts:(d.accounts||[]).map(a=>({...a,type:a.type||'bank'})),tx:d.tx||d.transactions||[]};
+ d.accounts=d.accounts||[];d.tx=d.tx||[];
+ d.accounts.forEach(a=>{if(a.type==='loan'&&!a.loan)a.loan={kind:'Other',lender:'',principal:-a.open,rate:+a.rate||0,months:0,first:'',emi:+a.emi||0,paidBefore:0}});
+ d.settings={cur:'INR'};d.v=SCHEMA;return d}
+function fresh(){return{v:SCHEMA,app:'ledger',settings:{cur:'INR'},accounts:[],tx:[]}}
+const $=s=>document.querySelector(s),uid=()=>Math.random().toString(36).slice(2,10),today=()=>new Date().toISOString().slice(0,10);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const INR=[0,1].map(z=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:z?0:2})),money=(n,c)=>INR[c?1:0].format(n),lk=n=>{const a=Math.abs(n),g=n<0?'−':'';return a>=1e7?g+'₹'+(a/1e7).toFixed(2)+' Cr':a>=1e5?g+'₹'+(a/1e5).toFixed(2)+' L':g+money(a,1)};
+const cls=n=>n<0?'neg':n>0?'pos':'';
+function toast(m){const t=$('#toast');t.textContent=m;t.className='on';setTimeout(()=>t.className='',2200)}
+function ask(msg,label,fn){const c=$('#cf');c.innerHTML=`<h3>${esc(msg)}</h3><div class="acts"><button class="b" id="c_no">Cancel</button><button class="b p" id="c_yes">${esc(label)}</button></div>`;$('#c_no').onclick=()=>c.close();$('#c_yes').onclick=()=>{c.close();fn()};c.showModal()}
+const acc=id=>S.accounts.find(a=>a.id===id);
+function delta(t,id){if(t.type==='income'&&t.acc===id)return t.amt;if(t.type==='expense'&&t.acc===id)return-t.amt;
+ if(t.type==='transfer'){if(t.acc===id)return-t.amt;if(t.to===id)return t.amt}return 0}
+function balance(a,upTo){return a.open+S.tx.reduce((s,t)=>(!upTo||t.date<=upTo)?s+delta(t,a.id):s,0)}
+function totals(upTo){let as=0,li=0;S.accounts.forEach(a=>{const b=balance(a,upTo);LIAB(a.type)?li+=b:as+=b});return{as,li,nw:as+li}}
+const month=d=>d.slice(0,7);
+function monthsList(n){const r=[],d=new Date();d.setDate(1);for(let i=n-1;i>=0;i--){const x=new Date(d.getFullYear(),d.getMonth()-i,1);r.push(x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0'))}return r}
+function mEnd(m){const[y,mo]=m.split('-').map(Number);return new Date(Date.UTC(y,mo,0)).toISOString().slice(0,10)}
+function flow(m){let i=0,e=0;S.tx.forEach(t=>{if(month(t.date)!==m)return;if(t.type==='income')i+=t.amt;if(t.type==='expense')e+=t.amt});return{i,e}}
+function catSpend(from,to){const c={};S.tx.forEach(t=>{if(t.type==='expense'&&t.date>=from&&t.date<=to)c[t.cat||'Other']=(c[t.cat||'Other']||0)+t.amt});return Object.entries(c).sort((a,b)=>b[1]-a[1])}
+
+const NAV=[['dash','◉','Dashboard'],['tx','⇄','Transactions'],['acc','▤','Accounts'],['loans','₹','Loans'],['rep','▦','Reports'],['data','⇅','Import & Backup']];
+function nav(){stat();$('#nav').innerHTML=NAV.map(([k,i,l])=>`<button class="nav ${view===k?'on':''}" data-v="${k}"><b>${i}</b><span>${l}</span></button>`).join('')}
+$('#nav').onclick=e=>{const b=e.target.closest('[data-v]');if(b){view=b.dataset.v;render()}};
+function render(){nav();if(!ready&&view!=='data')return welcome();({dash,tx:txView,acc:accView,loans:loanView,rep:repView,data:dataView})[view]()}
+
+/* Dashboard */
+function lineChart(pts,w=640,h=190){if(pts.length<2)return'<div class="empty">Add transactions to see your net worth trend.</div>';
+ const vs=pts.map(p=>p.v),mn=Math.min(...vs),mx=Math.max(...vs),r=(mx-mn)||1,px=i=>10+i*(w-20)/(pts.length-1),py=v=>h-24-(v-mn)/r*(h-44);
+ const path=pts.map((p,i)=>(i?'L':'M')+px(i).toFixed(1)+','+py(p.v).toFixed(1)).join('');
+ return`<svg viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="Net worth over time"><path d="${path}L${px(pts.length-1)},${h-24}L10,${h-24}Z" fill="var(--sel)"/><path d="${path}" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linejoin="round"/>
+ <text x="10" y="${h-6}" font-size="10" fill="var(--mu)">${pts[0].m}</text><text x="${w-10}" y="${h-6}" font-size="10" text-anchor="end" fill="var(--mu)">${pts.at(-1).m}</text>
+ <text x="10" y="12" font-size="10" fill="var(--mu)">${money(mx,1)}</text></svg>`}
+/* Data file (no browser storage): File System Access API with download/upload fallback */
+let FH=null,fname='',origin='',ready=false,dirty=false,tmr,pending=null,booting=!!window.showOpenFilePicker;
+let driveMode=false,driveFileId='',driveToken='',driveTokenUntil=0,driveKey=null,driveSalt=null,driveSaveTimer=null,driveBusy=false;
+function prefGet(k){try{return localStorage.getItem(k)||''}catch(e){return''}}
+function prefSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+driveFileId=prefGet('ledger_drive_file_id');
+const DRIVE_NAME='Ledger encrypted data.json',DRIVE_SCOPE='https://www.googleapis.com/auth/drive.file';
+const PICK={types:[{description:'Ledger data file',accept:{'application/json':['.json']}}]};
+function setData(d,name,org){driveMode=false;driveKey=null;driveSalt=null;S=migrate(d);fname=name;origin=org;ready=true;dirty=false;view='dash';render()}
+function save(){dirty=true;if(driveMode){clearTimeout(driveSaveTimer);driveSaveTimer=setTimeout(writeDrive,700)}else if(FH){clearTimeout(tmr);tmr=setTimeout(writeFile,400)}stat()}
+async function writeFile(){if(!FH)return;try{const w=await FH.createWritable();await w.write(JSON.stringify(S,null,1));await w.close();dirty=false;stat()}catch(e){toast('Couldn’t write to the file – check permissions or use Save a copy')}}
+async function openFile(){if(window.showOpenFilePicker){try{const[h]=await showOpenFilePicker(PICK);const f=await h.getFile(),d=JSON.parse(await f.text());try{await h.requestPermission({mode:'readwrite'})}catch(e){}const m=migrate(d);FH=h;remember();return setData(m,f.name,'file')}catch(e){if(e.name==='AbortError')return;if(e instanceof SyntaxError||e.message==='bad')return toast('That file isn’t a valid Ledger data file')}}
+ $('#pick').click()}
+async function newFile(){const mk=()=>{S=fresh()};if(window.showSaveFilePicker){try{const h=await showSaveFilePicker({suggestedName:'ledger-data.json',...PICK});FH=h;mk();remember();await writeFile();return setData(S,h.name,'file')}catch(e){if(e.name==='AbortError')return}}
+ FH=null;mk();setData(S,'ledger-data.json','new');dirty=true;stat();toast('New data file – press Save to download it')}
+async function saveFile(){if(!ready)return;if(driveMode){await writeDrive();return}if(FH){await writeFile();return toast('Saved to '+fname)}
+ if(window.showSaveFilePicker){try{FH=await showSaveFilePicker({suggestedName:fname||'ledger-data.json',...PICK});fname=FH.name;remember();await writeFile();return toast('Saved to '+fname)}catch(e){FH=null;if(e.name==='AbortError')return}}
+ dl(fname&&/\.json$/.test(fname)?fname:'ledger-data.json',JSON.stringify(S,null,1),'application/json');dirty=false;origin='file';stat();toast('Downloaded – keep this file safe and open it next time')}
+/* Remember the chosen file location (only the file handle is kept in the browser, never your data) */
+const idb=()=>new Promise((res,rej)=>{const r=indexedDB.open('ledger-file',1);r.onupgradeneeded=()=>r.result.createObjectStore('h');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+const idbGet=async()=>{const d=await idb();return new Promise(res=>{const q=d.transaction('h').objectStore('h').get('handle');q.onsuccess=()=>res(q.result);q.onerror=()=>res(null)})};
+const idbPut=async v=>{const d=await idb();return new Promise(res=>{const t=d.transaction('h','readwrite');v?t.objectStore('h').put(v,'handle'):t.objectStore('h').delete('handle');t.oncomplete=()=>res();t.onerror=()=>res()})};
+const remember=()=>{if(FH)idbPut(FH).catch(()=>{})};
+async function loadHandle(h){try{const f=await h.getFile(),m=migrate(JSON.parse(await f.text()));FH=h;pending=null;remember();setData(m,f.name,'file')}catch(e){if(e.name==='NotFoundError'){idbPut(null);pending=null;toast('Your data file was moved or deleted – choose it again')}else toast('Couldn’t open '+h.name+' – is it a Ledger data file?');render()}}
+async function reconnect(){const h=pending;if(!h)return;try{if(await h.requestPermission({mode:'readwrite'})!=='granted')return toast('Allow access to open '+h.name)}catch(e){}await loadHandle(h)}
+async function init(){try{if(window.showOpenFilePicker){const h=await idbGet();if(h){if(await h.queryPermission({mode:'readwrite'})==='granted')await loadHandle(h);else pending=h}}}catch(e){}booting=false;if(!ready)render()}
+async function saveAs(){if(driveMode)return toast('Your data is stored encrypted in Google Drive. Download an encrypted backup from Import & Backup.');if(!window.showSaveFilePicker)return saveFile();try{const h=await showSaveFilePicker({suggestedName:fname||'ledger-data.json',...PICK});FH=h;fname=h.name;origin='file';remember();await writeFile();render();toast('Data now saved to '+fname)}catch(e){if(e.name!=='AbortError')toast('Couldn’t use that location')}}
+function forgetFile(){idbPut(null);pending=null;FH=null;origin='new';dirty=true;stat();render();toast('Location forgotten – you’ll choose a file next time')}
+function stat(){const e=$('#fstat');if(!e)return;e.innerHTML=ready?`<b>${esc(fname)}</b><br>${driveMode?(dirty?'Saving encrypted to Google Drive…':'Encrypted in Google Drive'):FH?(dirty?'Saving…':'All changes saved to file'):(dirty||origin!=='file')?'Not saved yet':'Opened from file'}<br><button class="b" style="margin-top:6px;padding:2px 8px" onclick="saveFile()">${driveMode||FH?'Save now':'Save…'}</button>`:'No data file open'}
+function welcome(){if(booting){$('#main').innerHTML='<div class="card empty" style="max-width:560px;margin:8vh auto 0">Opening your data file…</div>';return}$('#main').innerHTML=`<div class="card" style="max-width:560px;margin:8vh auto 0;padding:28px"><h2 style="margin:0 0 8px;font-size:24px">Open your Ledger</h2>
+ <p class="mu">Ledger keeps nothing in the browser. Your data lives in one file that you choose, and every change is written back to it. Works fully offline.</p>
+ ${pending?`<p><button class="b p" onclick="reconnect()">Continue with ${esc(pending.name)}</button></p>`:''}<p style="display:flex;gap:8px;flex-wrap:wrap"><button class="b ${pending?'':'p'}" onclick="openFile()">Open data file…</button><button class="b" onclick="newFile()">Create new data file…</button><button class="b" onclick="sample()">Explore with sample data</button></p>
+ <p class="mu">${window.showOpenFilePicker?'Your browser can save straight to the file you pick, so changes are written automatically.':'This browser can’t write to a file directly. Open your file, and press Save (⌘S) to download the updated copy and replace the old one.'}</p></div>`}
+
+/* Loans – Indian style: reducing-balance EMI, prepayment, floating-rate changes */
+const LKINDS=['Home loan','Car loan','Two-wheeler loan','Personal loan','Education loan','Gold loan','Business loan','Loan against property','Other'];
+const emiOf=(P,r,n)=>{const q=r/1200;return q?Math.round(P*q*Math.pow(1+q,n)/(Math.pow(1+q,n)-1)):Math.round(P/n)};
+const addM=(d,k)=>{const[y,m,dd]=d.split('-').map(Number),x=new Date(Date.UTC(y,m-1+k,1)),last=new Date(Date.UTC(x.getUTCFullYear(),x.getUTCMonth()+1,0)).getUTCDate();x.setUTCDate(Math.min(dd,last));return x.toISOString().slice(0,10)};
+function balAfter(P,r,e,k){let b=P;const q=r/1200;for(let i=0;i<k&&b>0;i++)b=b*(1+q)-e;return Math.max(0,Math.round(b))}
+function remN(O,r,e){const q=r/1200;if(O<=0)return 0;if(!(e>0))return Infinity;if(!q)return Math.ceil(O/e);if(e<=O*q)return Infinity;return Math.ceil(-Math.log(1-O*q/e)/Math.log(1+q))}
+function loanInfo(a){const L=a.loan,O=Math.max(0,Math.round(-balance(a))),mine=S.tx.filter(t=>t.loan===a.id&&t.emi),paid=mine.filter(t=>t.type==='transfer').length+(L.paidBefore||0),
+ intr=mine.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amt,0),pre=S.tx.filter(t=>t.loan===a.id&&t.pre).reduce((s,t)=>s+t.amt,0),
+ emi=L.emi||(L.months?emiOf(L.principal,L.rate,L.months):0),n=remN(O,L.rate,emi),next=L.first?addM(L.first,paid):'';
+ return{L,O,paid,intr,pre,emi,n,next,end:next&&O>0&&isFinite(n)?addM(next,n-1):'',pr:L.principal?Math.max(0,Math.min(100,(1-O/L.principal)*100)):0}}
+function dueCount(i){let k=0;while(i.next&&i.O>0&&k<(isFinite(i.n)?i.n:600)&&addM(i.L.first,i.paid+k)<=today())k++;return k}
+function postEmis(a,from,count,onlyDue){const i=loanInfo(a);let O=i.O,n=0;
+ for(let k=0;k<count&&O>0;k++){const d=addM(i.L.first,i.paid+k);if(onlyDue&&d>today())break;const it=Math.round(O*i.L.rate/1200),pr=Math.min(Math.max(i.emi-it,0),O);if(pr<=0)break;
+  if(it>0)S.tx.push({id:uid(),date:d,type:'expense',amt:it,acc:from,to:'',cat:'Loan interest',payee:i.L.lender||a.name,note:'EMI '+(i.paid+k+1)+' – interest',loan:a.id,emi:1});
+  S.tx.push({id:uid(),date:d,type:'transfer',amt:pr,acc:from,to:a.id,cat:'',payee:'',note:'EMI '+(i.paid+k+1)+' – principal',loan:a.id,emi:1});O-=pr;n++}return n}
+function prepay(a,from,date,amt,pen,mode){const i=loanInfo(a);S.tx.push({id:uid(),date,type:'transfer',amt,acc:from,to:a.id,cat:'',payee:'',note:'Part-prepayment',loan:a.id,pre:1});
+ if(pen>0)S.tx.push({id:uid(),date,type:'expense',amt:Math.round(amt*pen)/100,acc:from,to:'',cat:'Interest & fees',payee:i.L.lender||a.name,note:'Prepayment charges',loan:a.id});
+ if(mode==='emi'&&isFinite(i.n)&&i.O-amt>0)a.loan.emi=emiOf(i.O-amt,i.L.rate,i.n)}
+const avgIncome=n=>{const ms=monthsEnding(today().slice(0,7),n+1).slice(0,n);return ms.reduce((s,m)=>s+flowR({from:m+'-01',to:mEnd(m)}).i,0)/n};
+function loanLine(a){const i=loanInfo(a);return`<div class="bar"><i style="width:${i.pr}%"></i></div><div class="mu">${Math.round(i.pr)}% repaid of ${lk(i.L.principal)} · ${i.L.kind} · ${i.L.rate}% · EMI ${money(i.emi,1)} — see Loans</div>`}
+const fyOf=()=>{const n=new Date(),y=n.getMonth()>=3?n.getFullYear():n.getFullYear()-1;return{from:y+'-04-01',to:(y+1)+'-03-31',label:y+'-'+String(y+1).slice(2)}};
+function loanView(){const fy=fyOf(),L=S.accounts.filter(a=>a.type==='loan'&&a.loan).map(a=>({a,i:loanInfo(a)})),act=L.filter(x=>x.i.O>0),
+ out=act.reduce((s,x)=>s+x.i.O,0),emi=act.reduce((s,x)=>s+x.i.emi,0),inc=avgIncome(3),foir=inc?Math.round(emi/inc*100):0,ip=L.reduce((s,x)=>s+x.i.intr,0);
+ $('#main').innerHTML=`<div class="top"><h2>Loans</h2><button class="b p" onclick="accDlg(null,'loan')">New loan</button></div>
+ <div class="grid g4" style="margin-bottom:14px"><div class="card"><h3>Total outstanding</h3><div class="big neg">${lk(out)}</div><div class="mu">${money(out,1)}</div></div><div class="card"><h3>Monthly EMIs</h3><div class="big">${money(emi,1)}</div></div>
+ <div class="card"><h3>EMI-to-income (FOIR)</h3><div class="big ${foir>50?'neg':''}">${foir}%</div><div class="mu">of avg. income, last 3 months. Lenders usually prefer under 40–50%.</div></div><div class="card"><h3>Interest paid so far</h3><div class="big">${money(ip,1)}</div></div></div>
+ ${L.length?L.map(({a,i})=>{const q=S.tx.filter(t=>t.loan===a.id&&t.emi&&t.date>=fy.from&&t.date<=fy.to),fi=q.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amt,0),fp=q.filter(t=>t.type==='transfer').reduce((s,t)=>s+t.amt,0),
+  dd=i.next?Math.round((Date.parse(i.next)-Date.parse(today()))/864e5):0,due=dueCount(i),proj=isFinite(i.n)?Math.max(0,i.n*i.emi-i.O):0,k=i.L.kind;
+  return`<div class="card" style="margin-bottom:14px"><div class="row"><div><b style="font-size:15px">${esc(a.name)}</b> <span class="tag">${esc(k)}</span><div class="mu">${esc(i.L.lender)}${i.L.lender?' · ':''}${i.L.rate}% p.a. · ${i.L.months} months · first EMI ${i.L.first}</div></div><div style="text-align:right"><div class="big neg">${money(i.O)}</div><div class="mu">outstanding</div></div></div>
+  <div class="bar"><i style="width:${i.pr}%"></i></div><div class="mu">${Math.round(i.pr)}% of ${lk(i.L.principal)} repaid · ${i.paid} EMIs paid${i.pre?' · prepaid '+money(i.pre,1):''}</div>
+  <div class="grid g4" style="margin:12px 0"><div><div class="mu">EMI</div><b>${money(i.emi,1)}</b></div><div><div class="mu">Next EMI</div><b>${i.O<=0?'Loan closed ✓':i.next}</b>${i.O>0?`<div class="${dd<0?'neg':'mu'}">${dd<0?'Overdue by '+(-dd)+' days':dd===0?'Due today':'in '+dd+' days'}${due>1?' · '+due+' EMIs due':''}</div>`:''}</div>
+  <div><div class="mu">Remaining</div><b>${isFinite(i.n)?i.n+' months':'—'}</b>${i.end?`<div class="mu">till ${i.end}</div>`:''}</div><div><div class="mu">Interest paid · still to pay</div><b>${money(i.intr,1)}</b><div class="mu">≈ ${money(proj,1)} more</div></div></div>
+  ${k==='Home loan'?`<div class="mu" style="margin-bottom:10px">FY ${fy.label} (old tax regime): interest ${money(fi,1)} of ₹2,00,000 limit u/s 24(b) for self-occupied property · principal ${money(fp,1)} counts toward the ₹1,50,000 limit u/s 80C. Confirm with your CA.</div>`:k==='Education loan'?`<div class="mu" style="margin-bottom:10px">FY ${fy.label}: interest ${money(fi,1)} is deductible u/s 80E, with no upper limit, for up to 8 years. Confirm with your CA.</div>`:''}
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="b p" onclick="emiDlg('${a.id}')" ${i.O<=0?'disabled':''}>Record EMI</button><button class="b" onclick="preDlg('${a.id}')" ${i.O<=0?'disabled':''}>Part-prepay</button><button class="b" onclick="rateDlg('${a.id}')" ${i.O<=0?'disabled':''}>Change rate</button><button class="b" onclick="schDlg('${a.id}')">Schedule</button><button class="b" onclick="accDlg('${a.id}')">Edit</button></div></div>`}).join(''):'<div class="card empty">No loans yet. Add a home, car, personal or education loan to track EMIs, prepayments and closure date.</div>'}`}
+function srcOpts(){return S.accounts.filter(a=>a.type!=='loan').map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('')}
+function emiDlg(id){const a=acc(id),i=loanInfo(a),d=$('#dlg'),it=Math.round(i.O*i.L.rate/1200);
+ d.innerHTML=`<h3>Record EMI · ${esc(a.name)}</h3><p class="mu">Next EMI ${i.next} · interest ≈ ${money(it,1)} · principal ≈ ${money(Math.max(0,i.emi-it),1)}. Each EMI is posted as a transfer for the principal plus an expense for the interest, on its due date.</p>
+ <div class="f"><div><label>Paid from</label><select id="e_src">${srcOpts()}</select></div><div><label>Number of EMIs</label><input type="number" min="1" id="e_n" value="${Math.max(1,dueCount(i))}"></div></div>
+ <div class="acts"><button class="b" onclick="dlg.close()">Cancel</button><button class="b p" id="e_ok">Record</button></div>`;
+ $('#e_ok').onclick=()=>{const n=postEmis(a,$('#e_src').value,Math.max(1,parseInt($('#e_n').value)||1));save();d.close();render();toast(n?n+' EMI'+(n>1?'s':'')+' recorded':'Nothing to record')};d.showModal()}
+function preDlg(id){const a=acc(id),d=$('#dlg');
+ d.innerHTML=`<h3>Part-prepayment · ${esc(a.name)}</h3><div class="f"><div><label>Amount (₹)</label><input type="number" id="p_amt"></div><div><label>Date</label><input type="date" id="p_dt" value="${today()}"></div>
+ <div><label>Paid from</label><select id="p_src">${srcOpts()}</select></div><div><label>Prepayment charges %</label><input type="number" step="0.01" id="p_pen" value="0"></div>
+ <div class="w"><label>Benefit</label><select id="p_mode"><option value="tenure">Reduce tenure (keep EMI)</option><option value="emi">Reduce EMI (keep tenure)</option></select></div></div>
+ <div class="acts"><button class="b" onclick="dlg.close()">Cancel</button><button class="b p" id="p_ok">Record</button></div>`;
+ $('#p_ok').onclick=()=>{const amt=parseFloat($('#p_amt').value);if(!(amt>0))return toast('Enter the prepayment amount');prepay(a,$('#p_src').value,$('#p_dt').value||today(),amt,parseFloat($('#p_pen').value)||0,$('#p_mode').value);save();d.close();render();toast('Prepayment recorded')};d.showModal()}
+function rateDlg(id){const a=acc(id),i=loanInfo(a),d=$('#dlg');
+ d.innerHTML=`<h3>Change interest rate · ${esc(a.name)}</h3><p class="mu">For floating-rate loans linked to the repo rate. Current rate ${i.L.rate}%.</p><div class="f"><div><label>New rate % p.a.</label><input type="number" step="0.01" id="r_new"></div>
+ <div><label>Adjust</label><select id="r_mode"><option value="tenure">Tenure (keep EMI)</option><option value="emi">EMI (keep tenure)</option></select></div></div>
+ <div class="acts"><button class="b" onclick="dlg.close()">Cancel</button><button class="b p" id="r_ok">Apply</button></div>`;
+ $('#r_ok').onclick=()=>{const r=parseFloat($('#r_new').value);if(!(r>=0))return toast('Enter the new rate');const n0=i.n;a.loan.rates=[...(a.loan.rates||[]),{date:today(),rate:i.L.rate}];a.loan.rate=r;if($('#r_mode').value==='emi'&&isFinite(n0))a.loan.emi=emiOf(i.O,r,n0);save();d.close();render();toast('Rate updated')};d.showModal()}
+function schedRows(a){const i=loanInfo(a),rows=[];let b=i.O;const q=i.L.rate/1200;for(let k=0;k<600&&b>0&&i.next&&isFinite(i.n);k++){const it=Math.round(b*q),pr=Math.min(Math.max(i.emi-it,0),b);if(pr<=0)break;b-=pr;rows.push([k+1+i.paid,addM(i.next,k),pr+it,it,pr,b])}return rows}
+function schDlg(id){const a=acc(id),rows=schedRows(a),d=$('#sc');
+ d.innerHTML=`<h3>Projected schedule · ${esc(a.name)}</h3><p class="mu">From today’s outstanding, at the current EMI and rate. ${rows.length} EMIs left.</p><div class="scroll" style="max-height:55vh"><table><thead><tr><th>#</th><th>Due</th><th class="r">EMI</th><th class="r">Interest</th><th class="r">Principal</th><th class="r">Balance</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td class="r">${money(r[2])}</td><td class="r">${money(r[3])}</td><td class="r">${money(r[4])}</td><td class="r">${money(r[5])}</td></tr>`).join('')}</tbody></table></div>
+ <div class="acts"><button class="b" id="s_c">Export CSV</button><button class="b" id="s_x">Export Excel</button><button class="b p" onclick="sc.close()">Close</button></div>`;
+ const ex=f=>exportSheets(f,'loan-schedule-'+a.name.replace(/\W+/g,'-'),[{name:'Schedule',rows:[['EMI no.','Due date','EMI','Interest','Principal','Balance'],...rows]}]);$('#s_c').onclick=()=>ex('csv');$('#s_x').onclick=()=>ex('xlsx');d.showModal()}
+
+/* Accounts dialog (loan-aware) */
+function accDlg(id,pre){const a=S.accounts.find(x=>x.id===id)||{type:pre||'bank',name:'',open:0,limit:''},L=a.loan||{kind:'Home loan',lender:'',principal:'',rate:'',months:'',first:today(),emi:'',paidBefore:0,out:''},d=$('#dlg');
+ d.innerHTML=`<h3>${id?'Edit':'New'} ${a.type==='loan'?'loan':'account'}</h3><div class="f"><div class="w"><label>Name</label><input id="a_name" value="${esc(a.name)}"></div>
+ <div class="w"><label>Type</label><select id="a_type">${Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${a.type===k?'selected':''}>${v}</option>`).join('')}</select></div>
+ <div id="w_open" class="w"><label id="l_open">Opening balance (₹)</label><input type="number" step="0.01" id="a_open" value="${a.type==='card'?-a.open:a.open}"></div>
+ <div id="w_lim" class="w"><label>Credit limit (₹)</label><input type="number" id="a_lim" value="${a.limit}"></div>
+ <div id="w_loan" class="w f" style="padding:0"><div><label>Loan type</label><select id="l_kind">${LKINDS.map(k=>`<option ${L.kind===k?'selected':''}>${k}</option>`).join('')}</select></div><div><label>Lender</label><input id="l_lender" placeholder="e.g. SBI, HDFC Bank" value="${esc(L.lender)}"></div>
+ <div><label>Loan amount (₹)</label><input type="number" id="l_prin" value="${L.principal}"></div><div><label>Interest % p.a.</label><input type="number" step="0.01" id="l_rate" value="${L.rate}"></div>
+ <div><label>Tenure (months)</label><input type="number" id="l_mon" value="${L.months}"></div><div><label>First EMI date</label><input type="date" id="l_first" value="${L.first}"></div>
+ <div><label>EMI (₹, blank = auto)</label><input type="number" id="l_emi" value="${L.emi}"></div><div><label>EMIs already paid before tracking</label><input type="number" id="l_paid" value="${L.paidBefore||0}"></div>
+ <div class="w"><label>Outstanding as per lender today (optional, overrides the calculation)</label><input type="number" id="l_out" value="${L.out||''}"></div></div></div>
+ <div class="acts">${id?'<button class="b d" id="a_del">Delete</button>':''}<span style="flex:1"></span><button class="b" onclick="dlg.close()">Cancel</button><button class="b p" id="a_ok">Save</button></div>`;
+ const sync=()=>{const t=$('#a_type').value;$('#w_open').style.display=t==='loan'?'none':'';$('#l_open').textContent=t==='card'?'Amount owed (₹)':'Opening balance (₹)';$('#w_lim').style.display=t==='card'?'':'none';$('#w_loan').style.display=t==='loan'?'':'none'};
+ $('#a_type').onchange=sync;sync();
+ $('#a_ok').onclick=()=>{const name=$('#a_name').value.trim(),type=$('#a_type').value;if(!name)return toast('Give the account a name');let v;
+  if(type==='loan'){const p=parseFloat($('#l_prin').value),r=parseFloat($('#l_rate').value),n=parseInt($('#l_mon').value),first=$('#l_first').value;if(!(p>0)||!(r>=0)||!(n>0)||!first)return toast('Enter loan amount, rate, tenure and first EMI date');
+   const emi=parseFloat($('#l_emi').value)||emiOf(p,r,n),pb=parseInt($('#l_paid').value)||0,out=parseFloat($('#l_out').value)||'',keep=id&&a.loan&&!out&&a.loan.principal===p&&(a.loan.paidBefore||0)===pb;
+   v={name,type,open:keep?a.open:-(out||balAfter(p,r,emi,pb)),limit:'',loan:{...(a.loan||{}),kind:$('#l_kind').value,lender:$('#l_lender').value.trim(),principal:p,rate:r,months:n,first,emi,paidBefore:pb,out}}}
+  else{const o=parseFloat($('#a_open').value)||0;v={name,type,open:type==='card'?-Math.abs(o):o,limit:parseFloat($('#a_lim').value)||'',loan:undefined}}
+  if(id)Object.assign(a,v);else S.accounts.push({id:uid(),...v});save();d.close();render()};
+ if(id)$('#a_del').onclick=()=>{const n=S.tx.filter(t=>t.acc===id||t.to===id).length;ask(`Delete this account${n?' and its '+n+' transactions':''}?`,'Delete',()=>{S.accounts=S.accounts.filter(x=>x.id!==id);S.tx=S.tx.filter(t=>t.acc!==id&&t.to!==id);save();d.close();render()})};
+ d.showModal()}
+
+/* Sample data (INR, Indian-style) */
+function sample(go){if(S.accounts.length&&go!==1)return ask('Add sample data alongside your existing data?','Add',()=>sample(1));
+ let sd=7;const R=()=>(sd=(sd*16807)%2147483647)/2147483647,ri=(a,b)=>Math.round(a+R()*(b-a)),pick=a=>a[Math.floor(R()*a.length)];
+ const A=(name,type,open,x={})=>{const a={id:uid(),name,type,open,...x};S.accounts.push(a);return a},ms=monthsList(36),F=ms[0]+'-05';
+ const LN=(kind,lender,p,r,n,first)=>({kind,lender,principal:p,rate:r,months:n,first,emi:emiOf(p,r,n),paidBefore:0});
+ const ck=A('HDFC Salary Account','bank',85000).id,sv=A('SBI Savings','bank',250000).id,cs=A('Cash Wallet','cash',4000).id,cd=A('HDFC Regalia Card','card',-12000,{limit:300000}).id,rc=A('Amazon Pay ICICI Card','card',-6000,{limit:150000}).id;
+ const hl=A('Home Loan – SBI','loan',-4500000,{loan:LN('Home loan','SBI',4500000,8.5,240,F)}),cl=A('Car Loan – HDFC Bank','loan',-800000,{loan:LN('Car loan','HDFC Bank',800000,9.2,60,F)}),pl=A('Personal Loan – Bajaj Finserv','loan',-300000,{loan:LN('Personal loan','Bajaj Finserv',300000,13,36,ms[12]+'-05')});
+ A('Apartment (market value)','invest',6500000);A('Car (market value)','invest',650000);const mf=A('Mutual Funds (SIP)','invest',400000).id,ppf=A('PPF','invest',300000).id,epf=A('EPF','invest',500000).id;
+ const add=(date,type,amt,acc,cat,payee,to='')=>{if(date<=today())S.tx.push({id:uid(),date,type,amt,acc,to,cat,payee,note:''})};
+ let owe={[cd]:12000,[rc]:6000},cur={};
+ ms.forEach((m,i)=>{const D=d=>m+'-'+String(d).padStart(2,'0'),dd=()=>D(ri(3,27)),cc=(a,amt,cat,p)=>{add(dd(),'expense',amt,a,cat,p);cur[a]=(cur[a]||0)+amt};
+  add(D(1),'income',Math.round(160000*Math.pow(1.1,Math.floor(i/12))),ck,'Salary','Employer Pvt Ltd');
+  if(i%12===2)add(D(28),'income',ri(100000,180000),ck,'Salary','Annual bonus');if(i%3===1)add(D(10),'income',ri(8000,30000),ck,'Business','Freelance client');
+  add(D(7),'income',6000+Math.floor(i/12)*500,epf,'Salary','EPF contribution');if(i%12===0)add(D(28),'income',ri(20000,30000),ppf,'Investment','PPF interest');
+  postEmis(hl,ck,1,true);postEmis(cl,ck,1,true);if(i>=12)postEmis(pl,ck,1,true);if(i===18)prepay(cl,sv,D(15),100000,0,'tenure');
+  add(D(3),'expense',3500,ck,'Housing','Society maintenance');add(D(4),'expense',3500,ck,'Other','Domestic help');add(D(6),'expense',ri(1800,4200),ck,'Utilities','Electricity bill');add(D(6),'expense',1179,ck,'Utilities','Airtel Broadband');add(D(6),'expense',749,ck,'Utilities','Jio recharge');
+  if(i%12===4)add(D(12),'expense',24000,ck,'Insurance','LIC premium');if(i%12===8)add(D(12),'expense',18000,ck,'Insurance','Star Health premium');
+  add(D(12),'transfer',8000,ck,'','',cs);for(let k=0;k<3;k++)add(dd(),'expense',ri(100,700),cs,pick(['Food','Transport','Other']),pick(['Chai stall','Auto fare','Vegetable vendor','Temple donation']));
+  for(let k=0;k<4;k++)cc(cd,ri(1500,4500),'Food',pick(['BigBasket','DMart','Reliance Fresh']));for(let k=0,n=ri(3,5);k<n;k++)cc(cd,ri(300,1800),'Food',pick(['Swiggy','Zomato','Saravana Bhavan','Barbeque Nation']));
+  for(let k=0;k<2;k++)cc(rc,ri(1500,3500),'Transport',pick(['HP Petrol Pump','Indian Oil']));for(let k=0;k<3;k++)cc(rc,ri(150,600),'Transport',pick(['Uber','Ola','Namma Metro']));
+  cc(rc,649,'Entertainment','Netflix');if(R()<.6)cc(rc,ri(400,1800),'Entertainment',pick(['PVR Cinemas','BookMyShow']));
+  for(let k=0,n=ri(1,3);k<n;k++)cc(cd,ri(800,6000),'Shopping',pick(['Amazon','Flipkart','Myntra','Lifestyle']));if(R()<.3)cc(cd,ri(300,2500),'Health',pick(['Apollo Pharmacy','Dr. Lal PathLabs']));
+  if(i%6===3)cc(rc,ri(2000,6000),'Education','Udemy');if(i%12===5||i%12===11)cc(rc,ri(15000,60000),'Travel',pick(['IndiGo','MakeMyTrip','Taj Hotels']));
+  if(m.endsWith('-10')||m.endsWith('-11'))cc(cd,ri(15000,40000),'Shopping','Diwali shopping');if(i===7)cc(cd,85000,'Shopping','Croma');if(i===20)add(D(14),'expense',45000,sv,'Housing','Home repairs');
+  [cd,rc].forEach(a=>{if(owe[a]>0)add(D(22),'transfer',owe[a],ck,'','',a)});owe={...cur};cur={};
+  add(D(18),'transfer',10000,ck,'','',sv);add(D(26),'income',ri(1500,2500),sv,'Investment','Savings interest');add(D(8),'transfer',15000,ck,'','',mf);add(D(27),'income',ri(4000,18000),mf,'Investment','Mutual fund gains');add(D(10),'transfer',5000,ck,'','',ppf)});
+ if(!fname){fname='Sample data (not saved)';origin='sample'}ready=true;save();view='dash';render();toast('Added 3 years of sample data in INR')}
+
+/* Period & analysis controls */
+const PD={preset:'m0',month:today().slice(0,7),from:'',to:'',chart:'pie',group:'cat',kind:'expense'};let P=PD;
+const PRESETS=[['m0','This month'],['m1','Last month'],['n2','Last 2 months'],['n3','Last 3 months'],['n6','Last 6 months'],['n12','Last 12 months'],['ytd','This year'],['all','All time'],['month','Specific month'],['custom','Custom range']];
+const GROUPS=[['cat','Category'],['payee','Payee'],['acc','Account'],['month','Month']];
+const COL=['#59768E','#5D8C87','#788F63','#B69A4C','#C07862','#987CA8','#BA7883','#6B91AF','#8D8B59','#927B68'];
+const GL=()=>GROUPS.find(g=>g[0]===P.group)[1].toLowerCase();
+function monthsEnding(ym,n){const[y,m]=ym.split('-').map(Number);return Array.from({length:n},(_,i)=>{const d=new Date(y,m-1-(n-1-i),1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')})}
+function monthsBetween(f,t){const r=[];let[y,m]=f.slice(0,7).split('-').map(Number);const e=t.slice(0,7);while(r.length<240){const k=y+'-'+String(m).padStart(2,'0');if(k>e)break;r.push(k);if(++m>12){m=1;y++}}return r}
+const mlabel=m=>{const[y,n]=m.split('-').map(Number);return new Date(y,n-1,1).toLocaleString('en',{month:'short',year:'numeric'})};
+function range(){const ym=today().slice(0,7),p=P.preset;let f,t;
+ if(p==='custom'){f=P.from||ym+'-01';t=P.to||today();if(f>t)[f,t]=[t,f];return{from:f,to:t}}
+ if(p==='m0')f=t=ym;else if(p==='m1')f=t=monthsEnding(ym,2)[0];else if(p[0]==='n'){f=monthsEnding(ym,+p.slice(1))[0];t=ym}
+ else if(p==='ytd'){f=ym.slice(0,4)+'-01';t=ym}else if(p==='all'){f=S.tx.reduce((m,x)=>x.date<m?x.date:m,today()).slice(0,7);t=ym}
+ else f=t=P.month||ym;return{from:f+'-01',to:mEnd(t)}}
+const inR=(t,r)=>t.date>=r.from&&t.date<=r.to;
+function flowR(r){let i=0,e=0;S.tx.forEach(t=>{if(!inR(t,r))return;if(t.type==='income')i+=t.amt;if(t.type==='expense')e+=t.amt});return{i,e}}
+function flowM(m,r){return flowR({from:m+'-01'>r.from?m+'-01':r.from,to:mEnd(m)<r.to?mEnd(m):r.to})}
+function prevR(r){const D=864e5,n=Math.round((Date.parse(r.to)-Date.parse(r.from))/D)+1,iso=x=>new Date(x).toISOString().slice(0,10);return{from:iso(Date.parse(r.from)-n*D),to:iso(Date.parse(r.from)-D)}}
+function breakdown(kind,group,r){const m=new Map;S.tx.forEach(t=>{if(t.type!==kind||!inR(t,r))return;const k=group==='cat'?(t.cat||'Uncategorised'):group==='payee'?(t.payee||'(no payee)'):group==='acc'?(acc(t.acc)?.name||'—'):month(t.date);m.set(k,(m.get(k)||0)+t.amt)});
+ return[...m].sort(group==='month'?(a,b)=>a[0].localeCompare(b[0]):(a,b)=>b[1]-a[1])}
+function chartHTML(en,type){if(!en.length)return'<div class="empty">Nothing recorded in this period.</div>';
+ let rows=en;if(rows.length>10&&P.group!=='month')rows=[...rows.slice(0,9),['Other',rows.slice(9).reduce((s,x)=>s+x[1],0)]];
+ const tot=en.reduce((s,x)=>s+x[1],0),pc=v=>`<span class="mu">${Math.round(v/tot*100)}%</span>`;
+ if(type==='pie'){const R=60,C=2*Math.PI*R;let off=0;
+  const arcs=rows.map(([k,v],i)=>{const L=v/tot*C,s=`<circle r="${R}" cx="80" cy="80" fill="none" stroke="${COL[i%10]}" stroke-width="30" stroke-dasharray="${L} ${C-L}" stroke-dashoffset="${-off}" transform="rotate(-90 80 80)"/>`;off+=L;return s}).join('');
+  return`<div class="pie"><svg viewBox="0 0 160 160" width="190" role="img" aria-label="Pie chart">${arcs}<text x="80" y="77" text-anchor="middle" font-size="9" fill="var(--mu)">Total</text><text x="80" y="92" text-anchor="middle" font-size="12" font-weight="700" fill="var(--tx)">${money(tot,1)}</text></svg><div class="lg">${rows.map(([k,v],i)=>`<div class="row"><span><i class="dot" style="background:${COL[i%10]}"></i>${esc(k)}</span><span>${money(v,1)} ${pc(v)}</span></div>`).join('')}</div></div>`}
+ const mx=Math.max(...rows.map(x=>x[1]));
+ return rows.map(([k,v],i)=>`<div class="row"><span style="width:120px">${esc(k)}</span><div class="bar" style="flex:1"><i style="width:${v/mx*100}%;background:${COL[i%10]}"></i></div><span style="width:125px;text-align:right">${money(v,1)} ${pc(v)}</span></div>`).join('')}
+function ctrl(){const r=range(),ym=today().slice(0,7);
+ return`<div class="bar-ctl"><select id="p_pre">${PRESETS.map(([k,l])=>`<option value="${k}" ${P.preset===k?'selected':''}>${l}</option>`).join('')}</select>
+ ${P.preset==='month'?`<select id="p_mon">${monthsEnding(ym,120).reverse().map(m=>`<option value="${m}" ${P.month===m?'selected':''}>${mlabel(m)}</option>`).join('')}</select>`:''}
+ ${P.preset==='custom'?`<input type="date" id="p_from" value="${r.from}"><span class="mu">to</span><input type="date" id="p_to" value="${r.to}">`:''}
+ <span class="mu">${r.from} – ${r.to}</span><span style="flex:1"></span>
+ <select id="p_kind"><option value="expense" ${P.kind==='expense'?'selected':''}>Spending</option><option value="income" ${P.kind==='income'?'selected':''}>Income</option></select>
+ <select id="p_grp">${GROUPS.map(([k,l])=>`<option value="${k}" ${P.group===k?'selected':''}>By ${l.toLowerCase()}</option>`).join('')}</select>
+ <div class="seg"><button data-c="pie" class="${P.chart==='pie'?'on':''}">Pie</button><button data-c="bar" class="${P.chart==='bar'?'on':''}">Bars</button></div></div>`}
+function savePrefs(){render()}
+function bindCtrl(){const set=(id,k)=>{const e=$(id);if(e)e.onchange=()=>{P[k]=e.value;savePrefs()}};
+ set('#p_pre','preset');set('#p_mon','month');set('#p_from','from');set('#p_to','to');set('#p_kind','kind');set('#p_grp','group');
+ document.querySelectorAll('.seg [data-c]').forEach(b=>b.onclick=()=>{P.chart=b.dataset.c;savePrefs()})}
+const dlt=(a,b)=>b?`<div class="mu">${a>=b?'▲':'▼'} ${Math.abs(Math.round((a-b)/b*100))}% vs. previous period</div>`:'';
+const expBar=fn=>`<button class="b" onclick="${fn}('csv')">Export CSV</button><button class="b" onclick="${fn}('xlsx')">Export Excel</button>`;
+
+/* Dashboard */
+function dash(){const r=range(),f=flowR(r),pf=flowR(prevR(r)),T=totals(r.to),sr=f.i?Math.round((f.i-f.e)/f.i*100):0;
+ const ms=monthsBetween(r.from,r.to),em=ms.length<6?monthsEnding(r.to.slice(0,7),6):ms,pts=em.map(m=>({m,v:totals(mEnd(m)).nw}));
+ const en=breakdown(P.kind,P.group,r),recent=S.tx.filter(t=>inR(t,r)).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,7);
+ $('#main').innerHTML=`<div class="top"><h2>Dashboard</h2>${expBar('repExp')}<button class="b p" onclick="txDlg()">New transaction</button></div>${ctrl()}
+ <div class="grid g2" style="margin-bottom:14px"><div class="card"><h3>Net worth at end of period</h3><div class="big hero ${cls(T.nw)}">${money(T.nw)}</div>${lineChart(pts)}</div>
+ <div class="grid" style="grid-template-columns:1fr 1fr"><div class="card"><h3>Assets</h3><div class="big pos">${money(T.as,1)}</div></div><div class="card"><h3>Liabilities</h3><div class="big neg">${money(-T.li,1)}</div></div>
+ <div class="card"><h3>Income</h3><div class="big">${money(f.i,1)}</div>${dlt(f.i,pf.i)}</div><div class="card"><h3>Spending</h3><div class="big">${money(f.e,1)}</div>${dlt(f.e,pf.e)}</div>
+ <div class="card" style="grid-column:1/-1"><h3>Net saved · savings rate</h3><div class="big ${cls(f.i-f.e)}">${money(f.i-f.e,1)} <span class="mu" style="font-size:16px">${sr}%</span></div></div></div></div>
+ <div class="grid g2"><div class="card"><h3>${P.kind==='expense'?'Spending':'Income'} by ${GL()}</h3>${chartHTML(en,P.chart)}</div>
+ <div class="card"><h3>Transactions in this period</h3>${recent.length?recent.map(t=>`<div class="row"><span>${esc(t.payee||t.cat||t.type)}<br><span class="mu">${t.date} · ${esc(acc(t.acc)?.name||'—')}</span></span><b class="${t.type==='income'?'pos':t.type==='expense'?'neg':''}">${t.type==='expense'?'−':t.type==='income'?'+':''}${money(t.amt)}</b></div>`).join(''):'<div class="empty">Nothing in this period. Pick another period or record a transaction.</div>'}</div></div>
+ ${S.accounts.length?'':'<div class="card" style="margin-top:14px"><b>Start here:</b> <button class="b" onclick="accDlg()">Add an account</button> <button class="b" onclick="sample()">Load sample data</button></div>'}`;bindCtrl()}
+
+/* Reports */
+function repView(){const r=range(),ms=monthsBetween(r.from,r.to),data=ms.map(m=>({m,...flowM(m,r)})),f=flowR(r),mx=Math.max(1,...data.flatMap(x=>[x.i,x.e])),w=640,h=200,bw=(w-20)/ms.length;
+ const en=breakdown(P.kind,P.group,r),tot=en.reduce((s,c)=>s+c[1],0),T=totals(r.to);
+ $('#main').innerHTML=`<div class="top"><h2>Reports</h2>${expBar('repExp')}</div>${ctrl()}
+ <div class="grid g4" style="margin-bottom:14px"><div class="card"><h3>Income</h3><div class="big pos">${money(f.i,1)}</div></div><div class="card"><h3>Spending</h3><div class="big neg">${money(f.e,1)}</div></div><div class="card"><h3>Net saved</h3><div class="big ${cls(f.i-f.e)}">${money(f.i-f.e,1)}</div></div><div class="card"><h3>Avg. monthly spend</h3><div class="big">${money(f.e/ms.length,1)}</div></div></div>
+ <div class="card" style="margin-bottom:14px"><h3>Income vs. spending by month</h3><svg viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="Monthly income and spending">${data.map((x,i)=>{const bx=10+i*bw,ih=x.i/mx*(h-40),eh=x.e/mx*(h-40);return`<rect x="${bx+bw*.12}" y="${h-24-ih}" width="${bw*.35}" height="${ih}" rx="2" fill="var(--pos)"/><rect x="${bx+bw*.5}" y="${h-24-eh}" width="${bw*.35}" height="${eh}" rx="2" fill="var(--neg)"/>${i%Math.ceil(ms.length/12)===0?`<text x="${bx+bw/2}" y="${h-8}" font-size="9" text-anchor="middle" fill="var(--mu)">${x.m.slice(2)}</text>`:''}`}).join('')}</svg><div class="mu">Green: income · Red: spending</div></div>
+ <div class="grid g2"><div class="card"><h3>${P.kind==='expense'?'Spending':'Income'} by ${GL()}</h3>${chartHTML(en,P.chart)}</div>
+ <div class="card scroll"><h3>Breakdown table</h3>${en.length?`<table><thead><tr><th>${GROUPS.find(g=>g[0]===P.group)[1]}</th><th class="r">Amount</th><th class="r">Share</th></tr></thead><tbody>${en.map(([k,v])=>`<tr><td>${esc(k)}</td><td class="r">${money(v)}</td><td class="r">${Math.round(v/tot*100)}%</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No data in this period.</div>'}</div></div>
+ <div class="card" style="margin-top:14px"><h3>Account balances at end of period</h3>${S.accounts.length?S.accounts.map(a=>{const b=balance(a,r.to);return`<div class="row"><span>${esc(a.name)} <span class="tag">${TYPES[a.type]}</span></span><b class="${cls(b)}">${money(b)}</b></div>`}).join('')+`<div class="row"><b>Net worth</b><b class="${cls(T.nw)}">${money(T.nw)}</b></div>`:'<div class="empty">No accounts.</div>'}</div>`;bindCtrl()}
+
+/* Exports */
+const toCSV=rows=>rows.map(r=>r.map(c=>/[",\n]/.test(c=String(c??''))?'"'+c.replace(/"/g,'""')+'"':c).join(',')).join('\n');
+function exportSheets(fmt,name,sheets){if(fmt==='csv')return dl(name+'.csv',sheets.length===1?toCSV(sheets[0].rows):sheets.map(s=>'# '+s.name+'\n'+toCSV(s.rows)).join('\n\n'),'text/csv');
+ if(!window.XLSX)return toast('Excel library didn’t load – use Export CSV');
+ const wb=XLSX.utils.book_new();sheets.forEach(s=>XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(s.rows),s.name.slice(0,31)));
+ dl(name+'.xlsx',new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})]),'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')}
+const txRows=L=>[H,...L.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(t=>[t.date,t.type,t.amt,acc(t.acc)?.name||'',t.type==='transfer'?acc(t.to)?.name||'':'',t.cat,t.payee,t.note])];
+const accRows=up=>[['Name','Type','Opening','Balance (liabilities negative)','Credit limit','Interest % p.a.','EMI'],...S.accounts.map(a=>[a.name,TYPES[a.type],a.open,balance(a,up),a.limit,a.loan?a.loan.rate:'',a.loan?loanInfo(a).emi:''])];
+function repExp(fmt){const r=range(),f=flowR(r),T=totals(r.to),en=breakdown(P.kind,P.group,r),tot=en.reduce((s,x)=>s+x[1],0);
+ exportSheets(fmt,'ledger-report-'+r.from+'_to_'+r.to,[
+ {name:'Summary',rows:[['Period',r.from+' to '+r.to],['Income',f.i],['Spending',f.e],['Net saved',f.i-f.e],['Assets at end',T.as],['Liabilities at end',-T.li],['Net worth at end',T.nw]]},
+ {name:'Breakdown',rows:[[(P.kind==='expense'?'Spending':'Income')+' by '+GL(),'Amount','% of total'],...en.map(([k,v])=>[k,v,tot?Math.round(v/tot*1000)/10:0])]},
+ {name:'Monthly',rows:[['Month','Income','Spending','Net'],...monthsBetween(r.from,r.to).map(m=>{const x=flowM(m,r);return[m,x.i,x.e,x.i-x.e]})]},
+ {name:'Transactions',rows:txRows(S.tx.filter(t=>inR(t,r)))},{name:'Accounts',rows:accRows(r.to)}])}
+const txExp=fmt=>exportSheets(fmt,'ledger-transactions-'+today(),[{name:'Transactions',rows:txRows(filtered())}]);
+const accExp=fmt=>exportSheets(fmt,'ledger-accounts-'+today(),[{name:'Accounts',rows:accRows()}]);
+const xlsAll=()=>exportSheets('xlsx','ledger-all-data-'+today(),[{name:'Transactions',rows:txRows(S.tx)},{name:'Accounts',rows:accRows()}]);
+
+/* Transactions */
+function filtered(){const q=flt.q.toLowerCase(),L=S.tx.filter(t=>(!flt.acc||t.acc===flt.acc||t.to===flt.acc)&&(!flt.type||t.type===flt.type)&&(!flt.from||t.date>=flt.from)&&(!flt.to||t.date<=flt.to)&&(!q||[t.payee,t.cat,t.note].join(' ').toLowerCase().includes(q))),cmp={'date-desc':(a,b)=>b.date.localeCompare(a.date),'date-asc':(a,b)=>a.date.localeCompare(b.date),'amount-desc':(a,b)=>b.amt-a.amt||b.date.localeCompare(a.date),'amount-asc':(a,b)=>a.amt-b.amt||b.date.localeCompare(a.date),'payee-asc':(a,b)=>String(a.payee||a.cat||a.type).localeCompare(String(b.payee||b.cat||b.type),undefined,{sensitivity:'base'})};return L.sort(cmp[flt.sort]||cmp['date-desc'])}
+function txView(){const L=filtered(),shown=L.slice(0,300);
+ $('#main').innerHTML=`<div class="top"><h2>Transactions</h2><button class="b" onclick="txExp('csv')">Export CSV</button><button class="b" onclick="txExp('xlsx')">Export Excel</button><button class="b p" onclick="txDlg()">New transaction</button></div>
+ <div class="card" style="margin-bottom:14px"><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">
+ <input id="q" placeholder="Search ⌘F" value="${esc(flt.q)}"><select id="fa"><option value="">All accounts</option>${S.accounts.map(a=>`<option value="${a.id}" ${flt.acc===a.id?'selected':''}>${esc(a.name)}</option>`).join('')}</select>
+ <select id="ft"><option value="">All types</option>${['income','expense','transfer'].map(t=>`<option ${flt.type===t?'selected':''}>${t}</option>`).join('')}</select>
+ <input type="date" id="ff" value="${flt.from}" title="From"><input type="date" id="fo" value="${flt.to}" title="To"><select id="fs" title="Sort transactions"><option value="date-desc" ${flt.sort==='date-desc'?'selected':''}>Newest first</option><option value="date-asc" ${flt.sort==='date-asc'?'selected':''}>Oldest first</option><option value="amount-desc" ${flt.sort==='amount-desc'?'selected':''}>Amount: high to low</option><option value="amount-asc" ${flt.sort==='amount-asc'?'selected':''}>Amount: low to high</option><option value="payee-asc" ${flt.sort==='payee-asc'?'selected':''}>Payee: A to Z</option></select></div></div>
+ <div class="card scroll">${shown.length?`<table><thead><tr><th>Date</th><th>Payee</th><th>Category</th><th>Account</th><th class="r">Amount</th><th></th></tr></thead><tbody>${shown.map(t=>`<tr><td>${t.date}</td><td>${esc(t.payee)}<div class="mu">${esc(t.note)}</div></td><td>${t.type==='transfer'?'<span class="tag">Transfer</span>':esc(t.cat)}</td><td>${esc(acc(t.acc)?.name||'—')}${t.type==='transfer'?' → '+esc(acc(t.to)?.name||'—'):''}</td><td class="r ${t.type==='income'?'pos':t.type==='expense'?'neg':''}">${t.type==='expense'?'−':t.type==='income'?'+':''}${money(t.amt)}</td><td class="r"><button class="b" onclick="txDlg('${t.id}')">Edit</button></td></tr>`).join('')}</tbody></table>
+ <div class="mu" style="padding-top:8px">${L.length} transactions${L.length>300?' (showing latest 300 – narrow the filters)':''}</div>`:'<div class="empty">No transactions match. Record one with New transaction.</div>'}</div>`;
+ const bind=(id,k)=>{const el=$(id);el.onchange=el.oninput=()=>{flt[k]=el.value;if(k==='q'){clearTimeout(window._t);window._t=setTimeout(txView,200);return}txView()}};
+ bind('#q','q');bind('#fa','acc');bind('#ft','type');bind('#ff','from');bind('#fo','to');bind('#fs','sort');
+ if(flt.q){const q=$('#q');q.focus();q.setSelectionRange(99,99)}}
+function txDlg(id){if(!S.accounts.length){toast('Add an account first');view='acc';render();return accDlg()}
+ const t=S.tx.find(x=>x.id===id)||{id:'',date:today(),type:'expense',amt:'',acc:S.accounts[0].id,to:'',cat:'',payee:'',note:''};
+ const opts=(sel,ex,cardOnly=false)=>S.accounts.filter(a=>a.id!==ex&&(!cardOnly||a.type==='card')).map(a=>`<option value="${a.id}" ${a.id===sel?'selected':''}>${esc(a.name)}</option>`).join('');
+ const d=$('#dlg');d.innerHTML=`<h3>${id?'Edit':'New'} transaction</h3><div class="f">
+ <div><label>Type</label><select id="t_type">${['expense','income','transfer','card payment'].map(x=>`<option ${x==='card payment'&&!S.accounts.some(a=>a.type==='card')?'disabled':''} ${t.type===x?'selected':''}>${x}</option>`).join('')}</select></div>
+ <div><label>Date</label><input type="date" id="t_date" value="${t.date}"></div>
+ <div><label>Amount</label><input type="number" step="0.01" min="0" id="t_amt" value="${t.amt}"></div>
+ <div><label id="l_acc">Account</label><select id="t_acc">${opts(t.acc)}</select></div>
+ <div class="w" id="w_to"><label>To account</label><select id="t_to">${opts(t.to,t.acc)}</select></div>
+ <div id="w_cat"><label>Category</label><input id="t_cat" list="cats" value="${esc(t.cat)}"><datalist id="cats">${[...EXP,...INC].map(c=>`<option>${c}</option>`).join('')}</datalist></div>
+ <div id="w_pay"><label>Payee / source</label><input id="t_pay" value="${esc(t.payee)}"></div>
+ <div class="w"><label>Note</label><input id="t_note" value="${esc(t.note)}"></div></div>
+ <div class="acts">${id?'<button class="b d" id="t_del">Delete</button>':''}<span class="sp" style="flex:1"></span><button class="b" onclick="dlg.close()">Cancel</button><button class="b p" id="t_ok">Save</button></div>`;
+ const sync=()=>{const ty=$('#t_type').value,tr=ty==='transfer',cp=ty==='card payment',showTo=tr||cp;$('#w_to').style.display=showTo?'':'none';$('#w_cat').style.display=$('#w_pay').style.display=showTo?'none':'';$('#l_acc').textContent=showTo?'From account':'Account';const to=$('#t_to'),keep=to.value;to.innerHTML=opts(keep||t.to,$('#t_acc').value,cp)};
+ $('#t_type').onchange=sync;$('#t_acc').onchange=sync;sync();
+ $('#t_ok').onclick=()=>{const cardPayment=$('#t_type').value==='card payment',v={id:t.id||uid(),date:$('#t_date').value,type:cardPayment?'transfer':$('#t_type').value,amt:Math.abs(parseFloat($('#t_amt').value)),acc:$('#t_acc').value,to:$('#t_to').value,cat:$('#t_cat').value.trim(),payee:$('#t_pay').value.trim(),note:$('#t_note').value.trim()};
+  if(!v.date||!(v.amt>0))return toast('Enter a date and an amount above 0');
+  if(v.type==='transfer'){if(!v.to||v.to===v.acc)return toast('Pick a different destination account');if(cardPayment&&acc(v.to)?.type!=='card')return toast('Choose a credit card account');v.cat='';v.payee='';if(cardPayment&&!v.note)v.note='Credit card payment'}else v.to='';
+  if(id)Object.assign(t,v);else S.tx.push(v);save();d.close();render();toast('Saved')};
+ if(id)$('#t_del').onclick=()=>{S.tx=S.tx.filter(x=>x.id!==id);save();d.close();render();toast('Deleted')};
+ d.showModal()}
+
+/* Accounts */
+function accView(){const groups=Object.keys(TYPES).map(k=>[k,S.accounts.filter(a=>a.type===k)]).filter(g=>g[1].length);
+ $('#main').innerHTML=`<div class="top"><h2>Accounts</h2><button class="b" onclick="accExp('csv')">Export CSV</button><button class="b" onclick="accExp('xlsx')">Export Excel</button><button class="b p" onclick="accDlg()">New account</button></div>
+ ${groups.length?groups.map(([k,L])=>`<div class="card" style="margin-bottom:14px"><h3>${TYPES[k]}s</h3>${L.map(a=>{const b=balance(a),owed=-b;let extra='';
+  if(a.type==='card'&&a.limit)extra=`<div class="bar"><i style="width:${Math.min(100,Math.max(0,owed/a.limit*100))}%"></i></div><div class="mu">${Math.round(Math.max(0,owed)/a.limit*100)}% of ${money(a.limit,1)} limit used</div>`;
+  if(a.type==='loan'&&a.loan)extra=loanLine(a);
+  return`<div style="padding:8px 0;border-bottom:1px solid var(--ln)"><div class="row"><b>${esc(a.name)}</b><span><b class="${LIAB(a.type)?'neg':''}">${LIAB(a.type)?money(owed):money(b)}</b> <button class="b" onclick="accDlg('${a.id}')">Edit</button></span></div>${extra}</div>`}).join('')}</div>`).join(''):'<div class="card empty">No accounts yet. Add your bank accounts, cards and loans to start tracking net worth.</div>'}`}
+/* Reports */
+/* Google Drive storage: data is encrypted in this browser before upload. */
+const b64=b=>{let s='';new Uint8Array(b).forEach(x=>s+=String.fromCharCode(x));return btoa(s)};
+const un64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function deriveDriveKey(pass,salt){const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:600000,hash:'SHA-256'},material,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+async function encryptWithDriveKey(data,key,salt){if(!crypto?.subtle)throw Error('Secure encryption requires HTTPS or localhost.');const iv=crypto.getRandomValues(new Uint8Array(12)),plain=new TextEncoder().encode(JSON.stringify(data)),cipher=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,plain);return{app:'ledger-encrypted',version:1,kdf:'PBKDF2-SHA-256',iterations:600000,salt:b64(salt),iv:b64(iv),ciphertext:b64(cipher)}}
+async function encryptDriveData(data,pass){if(!crypto?.subtle)throw Error('Secure encryption requires HTTPS or localhost.');const salt=crypto.getRandomValues(new Uint8Array(16)),key=await deriveDriveKey(pass,salt);return{envelope:await encryptWithDriveKey(data,key,salt),key,salt}}
+async function decryptDriveData(env,pass){if(env?.app!=='ledger-encrypted'||env.version!==1)throw Error('This is not a supported encrypted Ledger file.');const key=await deriveDriveKey(pass,un64(env.salt));try{const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:un64(env.iv)},key,un64(env.ciphertext));return{data:JSON.parse(new TextDecoder().decode(plain)),key}}catch(e){throw Error('Wrong passphrase or damaged encrypted file.')}}
+function saveDriveClient(){const v=$('#driveClientId')?.value.trim();if(!v)return toast('Enter your Google OAuth client ID first');prefSet('ledger_google_client_id',v);toast('Google client ID saved in this browser')}
+function driveStatus(msg){const e=$('#driveStatus');if(e)e.textContent=msg}
+function connectDrive(){const clientId=$('#driveClientId')?.value.trim()||prefGet('ledger_google_client_id')||'';if(!clientId)return toast('Add your Google OAuth client ID first');prefSet('ledger_google_client_id',clientId);if(!window.google?.accounts?.oauth2)return toast('Google sign-in is still loading. Try again in a moment.');
+ try{const client=google.accounts.oauth2.initTokenClient({client_id:clientId,scope:DRIVE_SCOPE,callback:r=>{if(r.error){driveToken='';driveStatus('Connection failed: '+r.error);return toast('Google Drive connection failed: '+r.error)}driveToken=r.access_token;driveTokenUntil=Date.now()+(Number(r.expires_in||3600)-60)*1000;driveStatus('Google Drive connected. Enter your encryption passphrase, then load or create your encrypted file.');toast('Google Drive connected')},error_callback:e=>{driveStatus('Google sign-in was closed or blocked.');toast('Google sign-in was not completed')}});client.requestAccessToken({prompt:'select_account'})}catch(e){driveStatus('Could not start Google sign-in. Check the OAuth client ID and allowed website address.');toast('Google sign-in setup needs attention')}}
+async function driveFetch(url,opts={}){if(!driveToken||Date.now()>driveTokenUntil)throw Error('Reconnect Google Drive, then try again.');const r=await fetch(url,{...opts,headers:{...(opts.headers||{}),Authorization:'Bearer '+driveToken}});if(!r.ok){const body=await r.text();if(r.status===401)driveToken='';throw Error('Google Drive returned '+r.status+(body?': '+body.slice(0,180):''))}return r}
+async function findDriveFile(){if(driveFileId)return driveFileId;const q=encodeURIComponent("name='"+DRIVE_NAME+"' and trashed=false");const r=await driveFetch('https://www.googleapis.com/drive/v3/files?q='+q+'&spaces=drive&fields=files(id,name,modifiedTime)&pageSize=10');const d=await r.json();if(d.files?.length){driveFileId=d.files[0].id;prefSet('ledger_drive_file_id',driveFileId);return driveFileId}return''}
+function drivePass(){const p=$('#drivePass')?.value||'';if(p.length<12){toast('Use an encryption passphrase at least 12 characters long');return''}return p}
+async function loadDriveData(){try{const pass=drivePass();if(!pass)return;const id=await findDriveFile();if(!id)return toast('No Ledger Drive file found yet. Create one from your current data.');const r=await driveFetch('https://www.googleapis.com/drive/v3/files/'+encodeURIComponent(id)+'?alt=media');const env=await r.json(),opened=await decryptDriveData(env,pass);S=migrate(opened.data);driveKey=opened.key;driveSalt=un64(env.salt);driveMode=true;FH=null;fname=DRIVE_NAME;origin='drive';ready=true;dirty=false;idbPut(null);view='dash';render();toast('Encrypted Drive data loaded')}catch(e){driveStatus('Could not load data. Check the passphrase and Drive access.');toast(e.message.includes('decrypt')?'Wrong passphrase or damaged encrypted file':e.message)}}
+async function createDriveData(){try{if(!ready)return toast('Open your existing data before making a Drive copy');const pass=drivePass();if(!pass)return;if(await findDriveFile())return toast('A Ledger Drive file already exists. Load it instead to avoid creating a duplicate.');const encrypted=await encryptDriveData(S,pass);let r=await driveFetch('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:DRIVE_NAME,mimeType:'application/json'})});const f=await r.json();driveFileId=f.id;if(!driveFileId)throw Error('Google Drive did not return a file ID.');prefSet('ledger_drive_file_id',driveFileId);r=await driveFetch('https://www.googleapis.com/upload/drive/v3/files/'+encodeURIComponent(driveFileId)+'?uploadType=media',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(encrypted.envelope)});driveKey=encrypted.key;driveSalt=encrypted.salt;driveMode=true;FH=null;fname=DRIVE_NAME;origin='drive';dirty=false;idbPut(null);stat();render();toast('Encrypted data file created in Google Drive')}catch(e){driveStatus('Could not create the encrypted file.');toast(e.message)}}
+async function writeDrive(){if(!driveMode||!driveFileId||!driveKey)return;if(driveBusy){clearTimeout(driveSaveTimer);driveSaveTimer=setTimeout(writeDrive,700);return}if(!driveToken||Date.now()>driveTokenUntil){driveStatus('Reconnect Google Drive to save pending changes.');toast('Changes are waiting. Reconnect Google Drive to save them.');return}driveBusy=true;const snapshot=JSON.stringify(S);try{const encrypted=await encryptWithDriveKey(JSON.parse(snapshot),driveKey,driveSalt);const r=await driveFetch('https://www.googleapis.com/upload/drive/v3/files/'+encodeURIComponent(driveFileId)+'?uploadType=media',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(encrypted.envelope)});if(JSON.stringify(S)===snapshot){dirty=false;driveStatus('Encrypted data saved to Google Drive');stat()}else{clearTimeout(driveSaveTimer);driveSaveTimer=setTimeout(writeDrive,300)}}catch(e){driveStatus('Save failed. Reconnect Google Drive and save again.');toast('Could not save encrypted data: '+e.message)}finally{driveBusy=false}}
+async function saveEncryptedCopy(){try{let env;if(driveMode){if(!driveKey||!driveSalt)return toast('Unlock your Google Drive file first');env=await encryptWithDriveKey(S,driveKey,driveSalt)}else{const pass=drivePass();if(!pass)return;env=(await encryptDriveData(S,pass)).envelope}dl('ledger-encrypted-backup-'+today()+'.json',JSON.stringify(env,null,1),'application/json');toast('Encrypted backup downloaded')}catch(e){toast(e.message)}}
+/* Import / Export / Backup */
+const H=['date','type','amount','account','to_account','category','payee','note'];
+function csvOut(filtered_){const rows=(filtered_?S.tx:S.tx).slice().sort((a,b)=>a.date.localeCompare(b.date)).map(t=>[t.date,t.type,t.amt,acc(t.acc)?.name||'',t.type==='transfer'?acc(t.to)?.name||'':'',t.cat,t.payee,t.note]);
+ dl('ledger-transactions-'+today()+'.csv',[H,...rows].map(r=>r.map(c=>/[",\n]/.test(c=String(c??''))?'"'+c.replace(/"/g,'""')+'"':c).join(',')).join('\n'),'text/csv')}
+function dl(name,txt,mime){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:mime}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function parseCSV(s){const rows=[];let r=[],c='',q=false;for(let i=0;i<s.length;i++){const ch=s[i];if(q){if(ch==='"'){if(s[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}else if(ch==='"')q=true;else if(ch===','){r.push(c);c=''}else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&s[i+1]==='\n')i++;r.push(c);c='';if(r.some(x=>x!==''))rows.push(r);r=[]}else c+=ch}
+ r.push(c);if(r.some(x=>x!==''))rows.push(r);return rows}
+function pdate(x){x=(x||'').trim();let m=x.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return`${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;m=x.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/);return m?`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`:''}
+function importCSV(txt){const rows=parseCSV(txt);if(rows.length<2)return toast('That CSV has no rows');const h=rows[0].map(x=>x.trim().toLowerCase().replace(/\s+/g,'_')),ix=n=>h.indexOf(n);
+ if(ix('date')<0||ix('amount')<0)return toast('CSV needs at least “date” and “amount” columns');
+ let n=0,sk=0;
+ const findAcc=nm=>S.accounts.find(x=>x.name.toLowerCase()===(nm||'').trim().toLowerCase());
+ const getAcc=nm=>{nm=(nm||'Imported').trim()||'Imported';let a=findAcc(nm);if(!a){a={id:uid(),name:nm,type:'bank',open:0};S.accounts.push(a)}return a};
+ const cardFor=(nm,hint)=>{const named=findAcc(nm);if(named?.type==='card')return named;const s=(String(nm||'')+' '+hint).toLowerCase();if(/sbi|gpay\s*flex/.test(s))return S.accounts.find(a=>a.type==='card'&&/sbi/i.test(a.name))||null;if(/hdfc|pixel/.test(s))return S.accounts.find(a=>a.type==='card'&&/hdfc/i.test(a.name))||null;return null};
+ rows.slice(1).forEach(r=>{const g=k=>ix(k)>=0?(r[ix(k)]||'').trim():'',date=pdate(g('date')),raw=parseFloat(g('amount').replace(/[^0-9.\-]/g,''));if(!date||isNaN(raw)){sk++;return}
+  const from=getAcc(g('account')),rawType=g('type').toLowerCase(),hint=[g('category'),g('payee'),g('note')].join(' ');let type=rawType,dest=null;
+  if(type==='card payment'){type='transfer';dest=cardFor(g('to_account'),hint)}
+  else if(type==='transfer'){dest=findAcc(g('to_account'))||getAcc(g('to_account'))}
+  else if(!['income','expense'].includes(type)){const explicitTo=findAcc(g('to_account'));if(explicitTo){type='transfer';dest=explicitTo}else type=raw<0?'expense':'income'}
+  if(type==='expense'&&from.type!=='card'&&/credit.?card.?payment|creditcardpayment|card.?payment/i.test(hint)){const inferred=cardFor(g('to_account'),hint);if(inferred){type='transfer';dest=inferred}}
+  if(type==='transfer'&&(!dest||dest.id===from.id)){sk++;return}
+  const t={id:uid(),date,type,amt:Math.abs(raw),acc:from.id,to:type==='transfer'?dest.id:'',cat:type==='transfer'?'':g('category'),payee:type==='transfer'?'':g('payee'),note:type==='transfer'&&dest.type==='card'?(g('note')||'Credit card payment recognized from statement'):g('note')};
+  S.tx.push(t);n++});save();render();toast(`Imported ${n} transactions${sk?', skipped '+sk:''}`)}
+function restore(txt){try{const d=migrate(JSON.parse(txt));ask(`Replace all data with this backup (${d.accounts.length} accounts, ${d.tx.length} transactions)?`,'Replace',()=>{S=d;ready=true;save();render();toast('Backup restored')})}catch(e){toast('That file isn’t a valid Ledger backup')}}
+function dataView(){$('#main').innerHTML=`<div class="top"><h2>Import &amp; Backup</h2></div>
+ <div class="card" style="margin-bottom:18px"><div class="row" style="padding-top:0"><div><h3 style="margin-bottom:3px">Your data file</h3><div class="mu">${driveMode?'Changes are encrypted and saved to Google Drive.':FH?'Changes save automatically to this file.':'Choose a file to save your changes.'}</div></div><span class="tag">${driveMode?'Encrypted Drive':FH?'Connected':'Not connected'}</span></div>
+ <div class="row"><b>${esc(fname||'No file selected')}</b><span class="mu">${driveMode?(dirty?'Saving encrypted…':'Encrypted and saved') :FH?(dirty?'Saving…':'All changes saved'):'Your data stays in a file you choose'}</span></div>
+ <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="b p" onclick="saveFile()">${FH?'Save now':'Save to file…'}</button><button class="b" onclick="openFile()">Open data file…</button><button class="b" onclick="saveAs()">Save as…</button><button class="b" onclick="newFile()">New file…</button>${FH?'<button class="b d" onclick="forgetFile()">Forget location</button>':''}</div>
+ </div>
+ <div class="card" style="margin-bottom:18px"><h3>Google Drive · encrypted storage</h3><p class="mu">Sign in to connect Drive. Your tracker data is encrypted in this browser with your passphrase before it is uploaded. Google stores only the encrypted file. Keep your passphrase safe; it cannot be reset.</p>
+ <div class="f"><div class="w"><label>Google OAuth client ID</label><input id="driveClientId" placeholder="123…apps.googleusercontent.com" value="${esc(prefGet('ledger_google_client_id')||'')}"></div><div class="w"><label>Encryption passphrase · at least 12 characters</label><input id="drivePass" type="password" autocomplete="new-password" placeholder="Never stored; needed to unlock your data"></div></div>
+ <p style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px"><button class="b" onclick="saveDriveClient()">Save client ID</button><button class="b p" onclick="connectDrive()">Connect Google Drive</button><button class="b" onclick="loadDriveData()">Load encrypted Drive file</button><button class="b" onclick="createDriveData()">Create encrypted Drive file from current data</button></p><div id="driveStatus" class="mu">${driveMode?'Using encrypted Google Drive file':driveToken?'Google Drive connected':'Not connected'}</div>
+ <details style="margin-top:10px"><summary class="mu" style="cursor:pointer">Google setup required</summary><p class="mu">In Google Cloud, enable the Google Drive API, configure the OAuth consent screen, create a Web application OAuth client, and add this site’s exact origin to Authorized JavaScript origins. Paste its client ID above. Use HTTPS hosting or localhost. The app requests the limited drive.file permission for its own file.</p></details></div>
+ <h3 style="margin:0 0 10px">Move data in or out</h3><div class="grid g2" style="margin-bottom:18px">
+ <div class="card"><h3>Import transactions</h3><p class="mu">Choose a CSV file. Required columns: date and amount. Rows are added to your current data; importing a file twice can create duplicates.</p><input type="file" id="fcsv" accept=".csv,text/csv"><details style="margin-top:10px"><summary class="mu" style="cursor:pointer">CSV format details</summary><p class="mu">Optional columns: ${H.filter(x=>!['date','amount'].includes(x)).join(', ')}. Dates can be YYYY-MM-DD or DD/MM/YYYY. Unknown accounts are created automatically. Use type “card payment” and the card in to_account for card payments.</p></details></div>
+ <div class="card"><h3>Backup or restore</h3><p class="mu">${driveMode?'Download a passphrase-protected copy, or import a previous Ledger backup.':'Save a full copy of your accounts and transactions, or restore from a previous Ledger backup.'}</p><button class="b p" onclick="${driveMode?'saveEncryptedCopy()':'dl(\'ledger-backup-\'+today()+\'.json\',JSON.stringify(S,null,1),\'application/json\')'}">${driveMode?'Download encrypted backup':'Download backup'}</button><p style="margin:14px 0 0"><label class="mu" for="fjson">Restore from a backup file</label><input type="file" id="fjson" accept=".json,application/json" style="margin-top:6px"></p></div>
+ <div class="card"><h3>Export</h3><p class="mu">Download transactions for Numbers, Excel, or another spreadsheet app.</p><button class="b" onclick="csvOut()">Download CSV</button> <button class="b" onclick="xlsAll()">Download Excel</button></div>
+ <div class="card"><h3>Appearance &amp; data</h3><div class="f"><div class="w"><label>Appearance</label><select id="th"><option value="">Match system</option><option>light</option><option>dark</option></select></div></div><p style="margin-bottom:0"><button class="b" onclick="sample()">Load sample data</button> <button class="b d" onclick="wipe()">Erase everything</button></p></div></div>`;
+ const rd=(el,fn)=>el.onchange=()=>{const f=el.files[0];if(!f)return;const r=new FileReader();r.onload=()=>fn(r.result);r.readAsText(f);el.value=''};
+ rd($('#fcsv'),importCSV);rd($('#fjson'),restore);
+ $('#th').onchange=e=>{e.target.value?document.documentElement.dataset.theme=e.target.value:delete document.documentElement.dataset.theme}}
+
+function wipe(){ask('Erase all accounts and transactions in the open data file?','Erase',()=>{S=fresh();save();view='dash';render()})}
+document.addEventListener('keydown',e=>{if(!(e.metaKey||e.ctrlKey))return;if(e.key==='s'){e.preventDefault();saveFile()}if(!ready)return;if(e.key==='n'){e.preventDefault();txDlg()}if(e.key==='f'){e.preventDefault();view='tx';render();$('#q').focus()}});
+$('#pick').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{FH=null;setData(JSON.parse(r.result),f.name,'file')}catch(x){toast('That file isn’t a valid Ledger data file')}};r.readAsText(f);e.target.value=''};
+addEventListener('beforeunload',e=>{if(ready&&dirty&&(!FH||driveMode)){e.preventDefault();e.returnValue=''}});
+render();init();
+</script></body></html>
