@@ -1,0 +1,4 @@
+# Personal financial data and exported backups; never publish these with the frontend.
+ledger-data.json
+ledger-backup-*.json
+ledger-encrypted-backup-*.json
